@@ -2,7 +2,8 @@ name: Deploy Nginx
 
 on:
   push:
-    branches: [ main ]
+    branches:
+    - 'main'
 
 jobs:
   deploy:
@@ -26,12 +27,12 @@ jobs:
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
         docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/demo/nginx:latest .
-        docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/demo/nginx:latest
-     
+        docker push  us-central1-docker.pkg.dev/$GOOGLE_PROJECT/demo/nginx:latest
+
     - name: deploy to gke
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
       run: |
-        gcloud container clusters get-credentials autopilot-clusters-1 --region us-central1
+        gcloud container clusters get-credentials autopilot-cluster-1 --region us-central1
         sed -i "s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g" resources.yaml
         kubectl apply -f resources.yaml
